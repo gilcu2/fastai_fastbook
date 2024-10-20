@@ -7,6 +7,7 @@ app = typer.Typer()
 
 models_path = "data/models"
 cat_dog_name = "cat_dog_classifier"
+segmentation_name="image_segmentation"
 home_dir = str(Path.home())
 project_dir = pathlib.Path(__file__).parent.parent.resolve()
 models_dir = project_dir / models_path
@@ -39,6 +40,18 @@ def classifiy_cat_dog(image_path: str = "data/images/cat.jpg", model_name: str =
     print(f"Is this a cat?: {was_cat}.")
     print(f"Probability it's a cat: {probs[1].item():.6f}")
     return was_cat, probs[1].item()
+
+@app.command()
+def tune4_image_segmentation(model_name: str = imag):
+    path = untar_data(URLs.CAMVID_TINY)
+    dls = SegmentationDataLoaders.from_label_func(
+        path, bs=8, fnames=get_image_files(path / "images"),
+        label_func=lambda o: path / 'labels' / f'{o.stem}_P{o.suffix}',
+        codes=np.loadtxt(path / 'codes.txt', dtype=str)
+    )
+
+    learn = unet_learner(dls, resnet34)
+    learn.fine_tune(8)
 
 
 if __name__ == "__main__":
