@@ -1,5 +1,5 @@
 from fastai.vision.all import *
-from fastai.learner import load_learner
+from fastai.learner import load_learner, Learner
 import typer
 import pathlib
 
@@ -7,14 +7,13 @@ app = typer.Typer()
 
 models_path = "data/models"
 cat_dog_name = "cat_dog_classifier"
-segmentation_name="image_segmentation"
+image_segmentation_name= "image_segmentation"
 home_dir = str(Path.home())
 project_dir = pathlib.Path(__file__).parent.parent.resolve()
 models_dir = project_dir / models_path
 
 
 def is_cat(x): return x[0].isupper()
-
 
 @app.command()
 def tune4_cat_dog(model_name: str = cat_dog_name):
@@ -42,7 +41,7 @@ def classifiy_cat_dog(image_path: str = "data/images/cat.jpg", model_name: str =
     return was_cat, probs[1].item()
 
 @app.command()
-def tune4_image_segmentation(model_name: str = imag):
+def tune4_image_segmentation(model_name: str = image_segmentation_name):
     path = untar_data(URLs.CAMVID_TINY)
     dls = SegmentationDataLoaders.from_label_func(
         path, bs=8, fnames=get_image_files(path / "images"),
